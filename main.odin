@@ -7,28 +7,32 @@ main :: proc() {
 	defer delete(scores)
 	scores["Team 1"] = 0
 	scores["Team 2"] = 0
-	scores["Team 2"] += 2
-	fmt.println(scores["Team 2"])
-	if scores["Team 2"] > scores["Team 1"] {
-		fmt.println("team 2 wins")
-	}
 
 	hitter: Hitter
 	hitter.bases_empty = true
-	team: Team
+	team_outs: Team
+	team: string
 
 	for team_one_outs != 0 {
-		team = .team_one
+		team_outs = .team_one
+		//player(hitter, 3.2, 0, 0, 0)
 	}
 
 	for team_two_outs != 0 {
-		team = .team_two
+		team_outs = .team_two
 	}
 
-	/*if hit.hit == true {
-		triple()
-		homerun()
-		douple()
-		single()
-	}*/
+	if scores["Team 1"] > scores["Team 2"] {
+		fmt.println("Team 1 wins")
+		fmt.printfln("Team 1: %i", scores["Team 1"])
+		fmt.printfln("Team 2: %i", scores["Team 2"])
+	} else if scores["Team 2"] > scores["Team 1"] {
+		fmt.println("Team 2 wins")
+		fmt.printfln("Team 1: %i", scores["Team 1"])
+		fmt.printfln("Team 2: %i", scores["Team 2"])
+	} else {
+		fmt.println("Tied after nine")
+		fmt.printfln("Team 1: %i", scores["Team 1"])
+		fmt.printfln("Team 2: %i", scores["Team 2"])
+	}
 }

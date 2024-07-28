@@ -10,9 +10,9 @@ walk :: proc(hitter: ^Hitter) {
 	}
 }
 
-hit :: proc(hitter: ^Hitter, BA: int) {
+hit :: proc(hitter: ^Hitter, BA: f64) {
 	ran := rand.choice(batting_avg[:])
-	if ran <= batting_avg[BA] {
+	if ran <= BA {
 		hitter.hit = true
 	}
 }
@@ -27,51 +27,42 @@ single :: proc(hitter: ^Hitter, scores: ^map[string]int, team: string) {
 
 }
 
-double :: proc(hitter: ^Hitter, dp: int, scores: ^map[string]int, team: string) {
+double :: proc(hitter: ^Hitter, dp: f64, scores: ^map[string]int, team: string) {
 	ran := rand.choice(batting_avg[:])
-	if ran <= batting_avg[dp] &&
-	   hitter.triple == false &&
-	   hitter.homerun == false &&
-	   hitter.single == false {
+	if ran <= dp && hitter.triple == false && hitter.homerun == false && hitter.single == false {
 		hitter.double = true
 		hitter.hit = false
 		bases_double(hitter, scores, team)
 	}
 }
 
-triple :: proc(hitter: ^Hitter, tp: int, scores: ^map[string]int, team: string) {
+triple :: proc(hitter: ^Hitter, tp: f64, scores: ^map[string]int, team: string) {
 	ran := rand.choice(batting_avg[:])
-	if ran <= batting_avg[tp] &&
-	   hitter.triple == false &&
-	   hitter.single == false &&
-	   hitter.double == false {
+	if ran <= tp && hitter.triple == false && hitter.single == false && hitter.double == false {
 		hitter.triple = true
 		hitter.hit = false
 		bases_triple(hitter, scores, team)
 	}
 }
 
-homerun :: proc(hitter: ^Hitter, hp: int, scores: ^map[string]int, team: string) {
+homerun :: proc(hitter: ^Hitter, hp: f64, scores: ^map[string]int, team: string) {
 	ran := rand.choice(batting_avg[:])
-	if ran <= batting_avg[hp] &&
-	   hitter.triple == false &&
-	   hitter.single == false &&
-	   hitter.double == false {
+	if ran <= hp && hitter.triple == false && hitter.single == false && hitter.double == false {
 		hitter.homerun = true
 		hitter.hit = false
 		bases_homerun(hitter, scores, team)
 	}
 }
 
-strike :: proc(hitter: ^Hitter, so: int, team: Team) {
+strike :: proc(hitter: ^Hitter, so: f64, team_outs: Team) {
 	ran := rand.choice(batting_avg[:])
-	if ran <= batting_avg[so] &&
+	if ran <= so &&
 	   hitter.fo == false &&
 	   hitter.po == false &&
 	   hitter.go == false &&
 	   hitter.ld == false {
 		hitter.so = true
-		switch team {
+		switch team_outs {
 		case .team_one:
 			team_one_outs -= 1
 		case .team_two:
@@ -80,15 +71,15 @@ strike :: proc(hitter: ^Hitter, so: int, team: Team) {
 	}
 }
 
-pop_out :: proc(hitter: ^Hitter, po: int, team: Team) {
+pop_out :: proc(hitter: ^Hitter, po: f64, team_outs: Team) {
 	ran := rand.choice(batting_avg[:])
-	if ran <= batting_avg[po] &&
+	if ran <= po &&
 	   hitter.fo == false &&
 	   hitter.so == false &&
 	   hitter.go == false &&
 	   hitter.ld == false {
 		hitter.po = true
-		switch team {
+		switch team_outs {
 		case .team_one:
 			team_one_outs -= 1
 		case .team_two:
@@ -97,15 +88,15 @@ pop_out :: proc(hitter: ^Hitter, po: int, team: Team) {
 	}
 }
 
-fly_out :: proc(hitter: ^Hitter, fo: int, team: Team) {
+fly_out :: proc(hitter: ^Hitter, fo: f64, team_outs: Team) {
 	ran := rand.choice(batting_avg[:])
-	if ran <= batting_avg[fo] &&
+	if ran <= fo &&
 	   hitter.po == false &&
 	   hitter.so == false &&
 	   hitter.go == false &&
 	   hitter.ld == false {
 		hitter.fo = true
-		switch team {
+		switch team_outs {
 		case .team_one:
 			team_one_outs -= 1
 		case .team_two:
@@ -114,15 +105,15 @@ fly_out :: proc(hitter: ^Hitter, fo: int, team: Team) {
 	}
 }
 
-line_drive :: proc(hitter: ^Hitter, ld: int, team: Team) {
+line_drive :: proc(hitter: ^Hitter, ld: f64, team_outs: Team) {
 	ran := rand.choice(batting_avg[:])
-	if ran <= batting_avg[ld] &&
+	if ran <= ld &&
 	   hitter.fo == false &&
 	   hitter.so == false &&
 	   hitter.go == false &&
 	   hitter.po == false {
 		hitter.ld = true
-		switch team {
+		switch team_outs {
 		case .team_one:
 			team_one_outs -= 1
 		case .team_two:
@@ -131,17 +122,17 @@ line_drive :: proc(hitter: ^Hitter, ld: int, team: Team) {
 	}
 }
 
-ground_out :: proc(hitter: ^Hitter, team: Team) {
+ground_out :: proc(hitter: ^Hitter, team_outs: Team) {
 	ran := rand.choice(batting_avg[:])
 	if hitter.fo == false && hitter.so == false && hitter.ld == false && hitter.po == false {
 		hitter.go = true
-		switch team {
+		switch team_outs {
 		case .team_one:
 			team_one_outs -= 1
 		case .team_two:
 			team_two_outs -= 1
 		}
-		switch team {
+		switch team_outs {
 		case .team_one:
 			team_one_outs -= 1
 		case .team_two:
@@ -242,6 +233,29 @@ bases_homerun :: proc(hitter: ^Hitter, scores: ^map[string]int, team: string) {
 	}
 }
 
+bases_walk :: proc(hitter: ^Hitter, scores: ^map[string]int, team: string) {
+	switch {
+	case hitter.bases_empty:
+		hitter.first_base = true
+		hitter.bases_empty = false
+	case hitter.first_base:
+		hitter.second_base = true
+		hitter.first_base = true
+		hitter.bases_empty = false
+	case hitter.first_base && hitter.second_base:
+		hitter.third_base = true
+		hitter.second_base = true
+		hitter.first_base = true
+		hitter.bases_empty = false
+	case hitter.first_base && hitter.second_base && hitter.third_base:
+		scores[team] += 1
+		hitter.third_base = false
+		hitter.second_base = true
+		hitter.first_base = true
+		hitter.bases_empty = false
+	}
+}
+
 out_reset :: proc(hitter: ^Hitter) {
 	switch {
 	case hitter.so:
@@ -254,5 +268,38 @@ out_reset :: proc(hitter: ^Hitter) {
 		hitter.fo = false
 	case hitter.ld:
 		hitter.ld = false
+	}
+}
+
+player :: proc(
+	hitter: ^Hitter,
+	BA: f64,
+	dp: f64,
+	tp: f64,
+	hp: f64,
+	so: f64,
+	po: f64,
+	fo: f64,
+	ld: f64,
+	scores: ^map[string]int,
+	team: string,
+	team_outs: Team,
+) {
+	walk(hitter)
+	if hitter.walk {
+		bases_walk(hitter, scores, team)
+	}
+	hit(hitter, BA)
+	if hitter.hit {
+		triple(hitter, tp, scores, team)
+		homerun(hitter, hp, scores, team)
+		double(hitter, dp, scores, team)
+		single(hitter, scores, team)
+	} else {
+		pop_out(hitter, po, team_outs)
+		line_drive(hitter, ld, team_outs)
+		strike(hitter, so, team_outs)
+		fly_out(hitter, fo, team_outs)
+		ground_out(hitter, team_outs)
 	}
 }
