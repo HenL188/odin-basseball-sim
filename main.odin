@@ -8,18 +8,45 @@ main :: proc() {
 	scores["Team 1"] = 0
 	scores["Team 2"] = 0
 
-	hitter: Hitter
-	hitter.bases_empty = true
+	hitter: Hitter = {
+		bases_empty = true,
+	}
 	team_outs: Team
-	team: string
 
-	for team_one_outs != 0 {
+	for team_one_outs >= 0 {
 		team_outs = .team_one
-		//player(hitter, 3.2, 0, 0, 0)
+		if team_one_outs <= 0 {
+			break
+		}
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		fmt.printfln("Team one: %i", team_one_outs)
+		fmt.println(scores["Team 1"])
 	}
 
-	for team_two_outs != 0 {
+	for team_two_outs >= 0 {
 		team_outs = .team_two
+		if team_two_outs <= 0 {
+			break
+		}
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		player(&hitter, 3.2, 1.3, .22, 0.1, .25, 2.2, .4, 2.9, 2.5, &scores, "Team 1", team_outs)
+		fmt.printfln("Team Two: %i", team_two_outs)
+		fmt.println(scores["Team 2"])
 	}
 
 	if scores["Team 1"] > scores["Team 2"] {

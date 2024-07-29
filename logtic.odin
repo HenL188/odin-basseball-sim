@@ -3,9 +3,9 @@ import "core:fmt"
 import "core:math/rand"
 
 
-walk :: proc(hitter: ^Hitter) {
+walk :: proc(hitter: ^Hitter, wr: f64) {
 	ran := rand.choice(batting_avg[:])
-	if ran <= batting_avg[89] {
+	if ran <= wr {
 		hitter.walk = true
 	}
 }
@@ -18,7 +18,6 @@ hit :: proc(hitter: ^Hitter, BA: f64) {
 }
 
 single :: proc(hitter: ^Hitter, scores: ^map[string]int, team: string) {
-	ran := rand.choice(batting_avg[:])
 	if hitter.double == false && hitter.triple == false && hitter.homerun == false {
 		hitter.single = true
 		hitter.hit = false
@@ -146,21 +145,24 @@ bases_single :: proc(hitter: ^Hitter, scores: ^map[string]int, team: string) {
 	case hitter.single && hitter.bases_empty:
 		hitter.first_base = true
 		hitter.bases_empty = false
+		fmt.printfln("%b", hitter.first_base)
 	case hitter.single && hitter.first_base:
 		hitter.second_base = true
-		hitter.first_base = true
 		hitter.bases_empty = false
+		fmt.printfln("%b, %b", hitter.first_base, hitter.second_base)
 	case hitter.single && hitter.first_base && hitter.second_base:
 		hitter.third_base = true
 		hitter.second_base = true
 		hitter.first_base = true
 		hitter.bases_empty = false
+		fmt.printfln("%b, %b, %b", hitter.first_base, hitter.second_base, hitter.third_base)
 	case hitter.single && hitter.first_base && hitter.second_base && hitter.third_base:
 		scores[team] += 1
 		hitter.third_base = false
 		hitter.second_base = true
 		hitter.first_base = true
 		hitter.bases_empty = false
+		fmt.printfln("%b, %b, %b", hitter.first_base, hitter.second_base, hitter.third_base)
 	}
 }
 
@@ -254,6 +256,7 @@ bases_walk :: proc(hitter: ^Hitter, scores: ^map[string]int, team: string) {
 		hitter.first_base = true
 		hitter.bases_empty = false
 	}
+	hitter.walk = false
 }
 
 out_reset :: proc(hitter: ^Hitter) {
@@ -269,11 +272,18 @@ out_reset :: proc(hitter: ^Hitter) {
 	case hitter.ld:
 		hitter.ld = false
 	}
+	if team_one_outs <= 0 {
+		team_one_outs = 0
+	}
+	if team_two_outs <= 0 {
+		team_two_outs = 0
+	}
 }
 
 player :: proc(
 	hitter: ^Hitter,
 	BA: f64,
+	wr: f64,
 	dp: f64,
 	tp: f64,
 	hp: f64,
@@ -285,9 +295,10 @@ player :: proc(
 	team: string,
 	team_outs: Team,
 ) {
-	walk(hitter)
+	walk(hitter, wr)
 	if hitter.walk {
 		bases_walk(hitter, scores, team)
+		fmt.println("Walk")
 	}
 	hit(hitter, BA)
 	if hitter.hit {
@@ -295,11 +306,13 @@ player :: proc(
 		homerun(hitter, hp, scores, team)
 		double(hitter, dp, scores, team)
 		single(hitter, scores, team)
+		fmt.println("Hit")
 	} else {
 		pop_out(hitter, po, team_outs)
 		line_drive(hitter, ld, team_outs)
 		strike(hitter, so, team_outs)
 		fly_out(hitter, fo, team_outs)
 		ground_out(hitter, team_outs)
+		out_reset(hitter)
 	}
 }
